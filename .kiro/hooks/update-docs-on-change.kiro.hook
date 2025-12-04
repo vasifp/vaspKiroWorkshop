@@ -6,7 +6,7 @@
     "pattern": "**/*.{py,ts}"
   },
   "action": {
-    "type": "sendMessage",
+    "type": "askAgent",
     "message": "The file {{filePath}} was just modified. Please review if any documentation needs to be updated:\n1. Check if the README.md needs updates for new/changed functionality\n2. If a Python file in backend/ was changed, regenerate pdoc documentation in backend/docs/\n3. Update any relevant inline code comments or docstrings\n\nOnly make documentation changes if the code changes warrant it."
   }
 }

@@ -11,7 +11,7 @@
     - Update scan/query operations for events listing
     - _Requirements: 6.1, 6.3_
 
-- [ ] 2. Implement User management
+- [x] 2. Implement User management
   - [x] 2.1 Add User Pydantic models
     - Create UserCreate, User models in `models.py`
     - Add validation for non-empty userId and name
@@ -29,7 +29,7 @@
     - **Property 2: Empty/whitespace user fields are rejected**
     - **Validates: Requirements 1.1, 1.3**
 
-- [ ] 3. Update Event model with waitlist support
+- [x] 3. Update Event model with waitlist support
   - [x] 3.1 Add waitlistEnabled field to Event models
     - Update EventCreate, EventUpdate, Event models
     - Default waitlistEnabled to false
@@ -46,7 +46,7 @@
 - [ ] 4. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 5. Implement Registration endpoints
+- [x] 5. Implement Registration endpoints
   - [x] 5.1 Add Registration Pydantic models
     - Create RegistrationCreate, Registration models
     - Include status (confirmed/waitlisted) and registeredAt fields
@@ -79,11 +79,11 @@
   - Ensure all tests pass, ask the user if questions arise.
 
 - [x] 7. Deploy and verify
-  - [ ] 7.1 Deploy updated infrastructure
+  - [x] 7.1 Deploy updated infrastructure
     - Run `cdk deploy` to update DynamoDB table and Lambda
     - Note: Table replacement may be required due to key schema change
     - _Requirements: 6.1_
-  - [ ] 7.2 Verify all endpoints work correctly
+  - [x] 7.2 Verify all endpoints work correctly
     - Test user creation, event creation with waitlist, registration flow
     - _Requirements: All_
 

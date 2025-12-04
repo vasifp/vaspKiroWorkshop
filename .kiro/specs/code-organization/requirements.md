@@ -35,6 +35,16 @@ This document specifies the requirements for refactoring the Events API codebase
 
 ### Requirement 3
 
+**User Story:** As a developer, I want business logic separated into dedicated service files, so that business rules are isolated from HTTP handling and data access.
+
+#### Acceptance Criteria
+
+1. WHEN business logic is needed THEN the System SHALL use service modules instead of inline logic in handlers
+2. WHEN a service is created THEN the System SHALL contain all validation and business rules
+3. WHEN services need data THEN the System SHALL call repository methods
+
+### Requirement 4
+
 **User Story:** As a developer, I want all existing API endpoints to remain functional after refactoring, so that there is no regression.
 
 #### Acceptance Criteria
@@ -42,3 +52,4 @@ This document specifies the requirements for refactoring the Events API codebase
 1. WHEN the refactoring is complete THEN the System SHALL maintain all existing endpoint paths
 2. WHEN the refactoring is complete THEN the System SHALL maintain all existing request/response formats
 3. WHEN the refactoring is complete THEN the System SHALL maintain all existing status codes
+4. WHEN the refactoring is complete THEN the System SHALL maintain all existing error messages

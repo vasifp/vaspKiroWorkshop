@@ -1,0 +1,91 @@
+# Implementation Plan
+
+- [ ] 1. Update DynamoDB table schema to use composite keys (PK/SK)
+  - [ ] 1.1 Update CDK infrastructure to create table with PK and SK
+    - Modify `infrastructure-stack.ts` to use composite key schema
+    - Add GSI for user registration queries if needed
+    - _Requirements: 6.1, 6.2_
+  - [ ] 1.2 Update existing event CRUD operations to use new key schema
+    - Modify `main.py` to use `PK=EVENT#{eventId}` and `SK=METADATA`
+    - Update all get_item, put_item, delete_item calls
+    - Update scan/query operations for events listing
+    - _Requirements: 6.1, 6.3_
+
+- [ ] 2. Implement User management
+  - [ ] 2.1 Add User Pydantic models
+    - Create UserCreate, User models in `models.py`
+    - Add validation for non-empty userId and name
+    - _Requirements: 1.1, 1.3_
+  - [ ] 2.2 Implement POST /users endpoint
+    - Create user with PK=USER#{userId}, SK=METADATA
+    - Check for duplicate userId before creation
+    - _Requirements: 1.1, 1.2_
+  - [ ] 2.3 Implement GET /users/{userId} endpoint
+    - Retrieve user by composite key
+    - Return 404 if not found
+    - _Requirements: 1.1_
+  - [ ]* 2.4 Write property tests for user creation
+    - **Property 1: User creation returns stored data**
+    - **Property 2: Empty/whitespace user fields are rejected**
+    - **Validates: Requirements 1.1, 1.3**
+
+- [ ] 3. Update Event model with waitlist support
+  - [ ] 3.1 Add waitlistEnabled field to Event models
+    - Update EventCreate, EventUpdate, Event models
+    - Default waitlistEnabled to false
+    - Add registrationCount field for tracking
+    - _Requirements: 2.1, 2.2_
+  - [ ] 3.2 Update event CRUD to handle new fields
+    - Store and retrieve waitlistEnabled and registrationCount
+    - _Requirements: 2.1, 2.3_
+  - [ ]* 3.3 Write property tests for event capacity/waitlist
+    - **Property 3: Event capacity and waitlist fields are persisted**
+    - **Property 4: Positive capacity validation**
+    - **Validates: Requirements 2.1, 2.3**
+
+- [ ] 4. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 5. Implement Registration endpoints
+  - [ ] 5.1 Add Registration Pydantic models
+    - Create RegistrationCreate, Registration models
+    - Include status (confirmed/waitlisted) and registeredAt fields
+    - _Requirements: 3.1, 3.5_
+  - [ ] 5.2 Implement POST /events/{eventId}/registrations
+    - Check event exists and get current registrationCount
+    - If capacity available: create confirmed registration
+    - If full and waitlistEnabled: add to waitlist with position
+    - If full and no waitlist: return 400 error
+    - Check for duplicate registration
+    - Store both EVENT#{eventId}/REG#{userId} and USER#{userId}/REG#{eventId}
+    - Increment registrationCount atomically
+    - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
+  - [ ] 5.3 Implement DELETE /events/{eventId}/registrations/{userId}
+    - Remove registration records from both access patterns
+    - If confirmed user leaves and waitlist exists: promote first waitlisted
+    - Decrement registrationCount
+    - _Requirements: 4.1, 4.2, 4.3, 4.4_
+  - [ ] 5.4 Implement GET /users/{userId}/registrations
+    - Query all items with PK=USER#{userId} and SK begins_with REG#
+    - Return list with eventId and status
+    - _Requirements: 5.1, 5.2, 5.3_
+  - [ ]* 5.5 Write property tests for registration logic
+    - **Property 5: Registration with available capacity succeeds as confirmed**
+    - **Property 6: Registration timestamp is recorded**
+    - **Property 7: Unregistration removes the registration**
+    - **Validates: Requirements 3.1, 3.5, 4.1**
+
+- [ ] 6. Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.
+
+- [ ] 7. Deploy and verify
+  - [ ] 7.1 Deploy updated infrastructure
+    - Run `cdk deploy` to update DynamoDB table and Lambda
+    - Note: Table replacement may be required due to key schema change
+    - _Requirements: 6.1_
+  - [ ] 7.2 Verify all endpoints work correctly
+    - Test user creation, event creation with waitlist, registration flow
+    - _Requirements: All_
+
+- [ ] 8. Final Checkpoint - Ensure all tests pass
+  - Ensure all tests pass, ask the user if questions arise.

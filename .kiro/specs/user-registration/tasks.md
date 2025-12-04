@@ -1,26 +1,26 @@
 # Implementation Plan
 
-- [ ] 1. Update DynamoDB table schema to use composite keys (PK/SK)
-  - [ ] 1.1 Update CDK infrastructure to create table with PK and SK
+- [x] 1. Update DynamoDB table schema to use composite keys (PK/SK)
+  - [x] 1.1 Update CDK infrastructure to create table with PK and SK
     - Modify `infrastructure-stack.ts` to use composite key schema
     - Add GSI for user registration queries if needed
     - _Requirements: 6.1, 6.2_
-  - [ ] 1.2 Update existing event CRUD operations to use new key schema
+  - [x] 1.2 Update existing event CRUD operations to use new key schema
     - Modify `main.py` to use `PK=EVENT#{eventId}` and `SK=METADATA`
     - Update all get_item, put_item, delete_item calls
     - Update scan/query operations for events listing
     - _Requirements: 6.1, 6.3_
 
 - [ ] 2. Implement User management
-  - [ ] 2.1 Add User Pydantic models
+  - [x] 2.1 Add User Pydantic models
     - Create UserCreate, User models in `models.py`
     - Add validation for non-empty userId and name
     - _Requirements: 1.1, 1.3_
-  - [ ] 2.2 Implement POST /users endpoint
+  - [x] 2.2 Implement POST /users endpoint
     - Create user with PK=USER#{userId}, SK=METADATA
     - Check for duplicate userId before creation
     - _Requirements: 1.1, 1.2_
-  - [ ] 2.3 Implement GET /users/{userId} endpoint
+  - [x] 2.3 Implement GET /users/{userId} endpoint
     - Retrieve user by composite key
     - Return 404 if not found
     - _Requirements: 1.1_
@@ -30,12 +30,12 @@
     - **Validates: Requirements 1.1, 1.3**
 
 - [ ] 3. Update Event model with waitlist support
-  - [ ] 3.1 Add waitlistEnabled field to Event models
+  - [x] 3.1 Add waitlistEnabled field to Event models
     - Update EventCreate, EventUpdate, Event models
     - Default waitlistEnabled to false
     - Add registrationCount field for tracking
     - _Requirements: 2.1, 2.2_
-  - [ ] 3.2 Update event CRUD to handle new fields
+  - [x] 3.2 Update event CRUD to handle new fields
     - Store and retrieve waitlistEnabled and registrationCount
     - _Requirements: 2.1, 2.3_
   - [ ]* 3.3 Write property tests for event capacity/waitlist
@@ -47,11 +47,11 @@
   - Ensure all tests pass, ask the user if questions arise.
 
 - [ ] 5. Implement Registration endpoints
-  - [ ] 5.1 Add Registration Pydantic models
+  - [x] 5.1 Add Registration Pydantic models
     - Create RegistrationCreate, Registration models
     - Include status (confirmed/waitlisted) and registeredAt fields
     - _Requirements: 3.1, 3.5_
-  - [ ] 5.2 Implement POST /events/{eventId}/registrations
+  - [x] 5.2 Implement POST /events/{eventId}/registrations
     - Check event exists and get current registrationCount
     - If capacity available: create confirmed registration
     - If full and waitlistEnabled: add to waitlist with position
@@ -60,12 +60,12 @@
     - Store both EVENT#{eventId}/REG#{userId} and USER#{userId}/REG#{eventId}
     - Increment registrationCount atomically
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
-  - [ ] 5.3 Implement DELETE /events/{eventId}/registrations/{userId}
+  - [x] 5.3 Implement DELETE /events/{eventId}/registrations/{userId}
     - Remove registration records from both access patterns
     - If confirmed user leaves and waitlist exists: promote first waitlisted
     - Decrement registrationCount
     - _Requirements: 4.1, 4.2, 4.3, 4.4_
-  - [ ] 5.4 Implement GET /users/{userId}/registrations
+  - [x] 5.4 Implement GET /users/{userId}/registrations
     - Query all items with PK=USER#{userId} and SK begins_with REG#
     - Return list with eventId and status
     - _Requirements: 5.1, 5.2, 5.3_
@@ -78,7 +78,7 @@
 - [ ] 6. Checkpoint - Ensure all tests pass
   - Ensure all tests pass, ask the user if questions arise.
 
-- [ ] 7. Deploy and verify
+- [x] 7. Deploy and verify
   - [ ] 7.1 Deploy updated infrastructure
     - Run `cdk deploy` to update DynamoDB table and Lambda
     - Note: Table replacement may be required due to key schema change

@@ -10,10 +10,20 @@ export class InfrastructureStack extends cdk.Stack {
   constructor(scope: Construct, id: string, props?: cdk.StackProps) {
     super(scope, id, props);
 
-    const eventsTable = new dynamodb.Table(this, 'EventsTable', {
-      partitionKey: { name: 'eventId', type: dynamodb.AttributeType.STRING },
+    // Single-table design with composite key (PK/SK)
+    const mainTable = new dynamodb.Table(this, 'MainTable', {
+      partitionKey: { name: 'PK', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'SK', type: dynamodb.AttributeType.STRING },
       billingMode: dynamodb.BillingMode.PAY_PER_REQUEST,
       removalPolicy: cdk.RemovalPolicy.DESTROY,
+    });
+
+    // GSI for querying user registrations by user
+    mainTable.addGlobalSecondaryIndex({
+      indexName: 'GSI1',
+      partitionKey: { name: 'GSI1PK', type: dynamodb.AttributeType.STRING },
+      sortKey: { name: 'GSI1SK', type: dynamodb.AttributeType.STRING },
+      projectionType: dynamodb.ProjectionType.ALL,
     });
 
     const backendLambda = new PythonFunction(this, 'BackendLambda', {
@@ -22,13 +32,13 @@ export class InfrastructureStack extends cdk.Stack {
       index: 'main.py',
       handler: 'handler',
       environment: {
-        TABLE_NAME: eventsTable.tableName,
+        TABLE_NAME: mainTable.tableName,
       },
       timeout: cdk.Duration.seconds(30),
       memorySize: 256,
     });
 
-    eventsTable.grantReadWriteData(backendLambda);
+    mainTable.grantReadWriteData(backendLambda);
 
     const api = new apigateway.LambdaRestApi(this, 'EventsApi', {
       handler: backendLambda,

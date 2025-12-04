@@ -22,6 +22,11 @@ node_modules/
 !bin/*.js
 !lib/*.js
 
+# Frontend
+frontend/dist/
+frontend/node_modules/
+.env.local
+
 # CDK
 cdk.out/
 .cdk.staging/
